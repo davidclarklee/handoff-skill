@@ -35,7 +35,8 @@ The obvious fix is to ask for a summary. But a simple summary can get really mes
 really fast. There are miles of nuance in your chat. Things that you tried and found 
 were the wrong approach, and random solutions Claude stumbled across and you have no 
 idea how to put into words.
-What the new session needs is a picture of **what's true right now**, plus, and most importantly, **the reasoning that isn't saved anywhere else**.
+What the new session needs is a picture of **what's true right now**, plus, and most importantly, 
+**the reasoning that isn't saved anywhere else**.
 
 That's what this skill writes... and more. 
 
@@ -153,7 +154,8 @@ Three more things protect that rule:
 
 1. **Nothing gets trimmed to hit a length limit.** As mentioned, the pasted work 
    sits outside the 150-to-300-line target. If a file is big enough that pasting it 
-   whole seems unwise, the skill stops and asks you rather than deciding alone. **If you don't answer, it pastes the whole thing.**
+   whole seems unwise, the skill stops and asks you rather than deciding alone. 
+   **If you don't answer, it pastes the whole thing.**
 2. **Scrubbing passwords takes priority over completeness.** Before pasting, it 
    scans your work for keys and personal details. If it finds any it stops and 
    tells you what it found and where, without printing the secret back at you. 
@@ -330,7 +332,8 @@ and none of it was touched by this update:
   tokens, database connection strings, that kind of thing pulled out of error text
   or logs before anything gets written down.
   
-  (This list may be incomplete, as it wasn't the primary objective of the session.)
+  (This list may be incomplete, as it wasn't the primary objective of the session
+  that produced this output &#58;)
 
 ## The clarification flagged during the build process: redaction still applies to the verbatim content
 
