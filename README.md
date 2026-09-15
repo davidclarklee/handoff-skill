@@ -5,10 +5,10 @@ the next session can pick it up and keep working. The next session can be a fres
 Claude Code window, a chat on claude.ai, or a completely different assistant like
 ChatGPT or Gemini.
 
-After creating this skill, research was done to find other similar handoff skills, 
-and after finding the two most popular skills by Matt Pocock & ToolMonsters, 
-this skill was compared against them, and any positive attributes from those two 
-leading skills were added to this already robust handoff skill.
+After creating this skill, research was done to find other similar handoff skills.
+The two most popular, by Matt Pocock and ToolMonsters, plus a third by Ruben Hassid,
+were each compared against this skill, and any positive attributes from them were
+added to this already robust handoff skill.
 
 More information can be found at the [end of this readme](#Attribution) regarding what positive 
 attributes were selected from each skill and then added to this build.
@@ -18,7 +18,7 @@ and some human adjustments have been made when the language was too robotic.
 
 The skill itself has been checked for any security issues, but feel free to upload it 
 to Claude and have it check out the skill for you before you install it. It's a best 
-practice procedure to follow with any skill with a low gihub star count like mine.
+practice procedure to follow with any skill with a low GitHub star count like mine.
 
 ## The problem
 
@@ -61,6 +61,12 @@ away, because it looks like clutter. This skill goes looking for it on purpose.
 
 - **It checks the files before it trusts its memory.**
 
+- **It reads the chat a second time before delivering.** After drafting, it goes back
+for the things a first read misses: a correction you made once in passing, a limit
+you mentioned once and never repeated, and whether a file reference points at the
+current version. If two parts of the chat contradict each other and it was never
+settled, it lists that as an open question instead of picking a side.
+
 - **It asks where the handoff is going, and never assumes.**
 
 - **It includes your actual work when the next session can't reach your files.** More
@@ -72,31 +78,40 @@ on this below, because it's the rule people ask about most.
 
 - **It copies names and numbers exactly.**
 
-- **It removes passwords and personal details.** Paired with the previous bullet,
-which is a result of Tool Monster's "verbatim" instructions. This directive insures
-that the output is scrubbed of any "dangerous" information such as password, an access 
-key, or a real person’s email address. The next session learns how the thing works 
-without inheriting your credentials.
+- **It removes passwords and personal details.** It scrubs out "dangerous" information
+such as a password, an access key, or a real person’s email address. If it isn't sure
+whether something counts, it asks you instead of guessing. The next session learns how
+the thing works without inheriting your credentials.
 
-- **It separates facts that expire from facts that don't.** When a session produces 
-permanent knowledge, the skill writes a **second, short file** just for that.
+- **It separates facts that expire from facts that don't.** When a session produces
+enough permanent knowledge (like setup quirks that cost you time, or a rejected idea
+likely to come up again), the skill writes a **second, short file** just for that.
+If there isn't enough, it says so in one line and skips the file. It also tells you
+where that file should live so it gets read automatically: as `CLAUDE.md` in your
+project folder for Claude Code, in Project knowledge on claude.ai, or in another AI's
+saved-instructions setting.
 
 - **It tells you which files to bring.** A handoff that mentions `screenshot-3.png`
-is useless if the screenshot stays behind. So the chat reply ends with a plain
-checklist of everything to drag into the next session. That list sits outside the
-document on purpose, so you don't have to open the document to find out what to
-move.
+is useless if the screenshot stays behind. So the list of files to bring goes in two
+places: inside the document, and as a plain checklist at the end of the chat reply,
+so you don't have to open the document to find out what to move. If the next session
+is a terminal tool other than Claude Code, the fingerprint script is on that list too.
 
-- **It keeps things short.** Another instruction related to the "verbatim" directive.
-Most handoffs land between 150 and 300 lines. Past about 500, it assumes it started 
+- **It won't overwrite your files without asking.** If a file it wants to write already
+exists, like an older handoff or a `CLAUDE.md`, it checks with you first. For an existing
+`CLAUDE.md`, it shows you what it would add instead of replacing what's there.
+
+- **It keeps things short.** Most handoffs land between 150 and 300 lines. Past about 500, it assumes it started 
 telling the story of the session instead of describing where things stand and reevaluates
 what is going into the markdown document. However, pasted work is not counted in those 
 numbers and is never shortened to fit them.
 
-- **It offers to test itself.** 
+- **It suggests you test the handoff.** It recommends opening a fresh chat with
+nothing but the handoff, and watching whether the new session asks sensible
+questions or charges ahead on assumptions.
 
 - **It names other skills that would help.** Taken from the comparison with Matt Pocock's
-handoff skill, because of his multiple skills he's created,it lists them *and* explains 
+handoff skill, because of his multiple skills he's created, it lists them *and* explains 
 in one line what each one does, so the note still makes sense if the next session doesn't 
 have that skill installed. It skips this entirely when you're heading somewhere that
 can't use Claude skills at all.
@@ -122,6 +137,9 @@ No "here's the handoff you asked for," no sign-off.
 - **Open items**, **open questions**, and **how to verify a change**
 - **Working preferences:** how you like to be worked with, and corrections you've made
 - **Suggested skills:** when the destination can use them
+- **Suggested opening prompt:** a ready-to-paste first message for the new chat, when
+  heading to claude.ai or another AI. Left out for Claude Code, which opens the file
+  directly.
 
 Empty sections get dropped rather than padded. Depending on the session you may
 also get `project-notes-<topic>.md`, the permanent-knowledge file described above.
@@ -146,8 +164,10 @@ picks.
 - **Going to claude.ai, or to ChatGPT, Gemini, or anything else?** Your work gets
   pasted in whole. Those places can't reach your computer, so a file path is a dead
   end there.
-- **Don't know yet?** It pastes everything. A document that's longer than it needed
-  to be just wastes a little space. A document pointing at a file nobody can open
+- **Don't know yet?** It asks one simpler question: should your work be pasted in
+  full, or just referenced by its file path? If you can't answer that either, it
+  pastes everything. A document that's longer than it needed to be just wastes a
+  little space. A document pointing at a file nobody can open
   has lost the one thing it was carrying.
 
 Three more things protect that rule:
@@ -164,7 +184,7 @@ Three more things protect that rule:
    it says so and offers you the choice: attach it, accept a description, or drop 
    the section with a note explaining why.
 
-## The bundled script (why this skill is Handoff.skill and not SKILL.md)
+## The bundled script (why this skill is handoff.skill and not SKILL.md)
 
 Most public skills are a single instruction file. This one ships with a small
 helper: `scripts/inventory.py`.
@@ -173,17 +193,22 @@ It produces a table of every file that matters, with each file's size and a shor
 fingerprint (a 12-character hash) of its contents. That table goes in the *Paths
 and inventory* section.
 
-The point is to catch changes. The next session can re-run the script and compare.
-If a fingerprint doesn't match, somebody edited that file after the handoff was
-written, and it should be sorted out before anyone starts editing further. Without
-this, the next session trusts a description of a file that has since moved on.
+The point is to catch changes. When the next session can run commands on your files
+(a new Claude Code session, or a terminal tool like Codex CLI with the files checked
+out), the handoff tells it to offer to re-run the script and compare before editing
+anything, and to run nothing without a yes. If a fingerprint doesn't match, somebody
+edited that file after the handoff was written, and it should be sorted out before
+anyone starts editing further. Without this, the next session trusts a description
+of a file that has since moved on. For a plain chat like claude.ai or ChatGPT on the
+web, this step is left out, since there's nothing to run it on.
 
 One detail worth knowing: for zipped file types, including `.zip`, `.skill`,
 `.docx`, `.xlsx` and `.pptx`, it fingerprints the contents rather than the
 container. Rezipping a file changes the outside bytes even when nothing inside
 changed, so fingerprinting the container would report changes that never happened.
 The script is also strict on purpose: if you point it at a file that doesn't exist,
-it reports an error rather than quietly printing a short table. An incomplete
+it still prints the table for the files it found, but it also names the missing file
+and ends with an error, so the gap can't go unnoticed. An incomplete
 inventory is worse than none, because the next session believes it.
 
 Run it directly if you ever want to:
@@ -192,13 +217,16 @@ Run it directly if you ever want to:
 python scripts/inventory.py <path> [<path> ...]
 ```
 
-The script must stay in `scripts/` next to `SKILL.md`. Copying `SKILL.md` on its
-own gives you a skill that refers to a tool that isn't there.
+When installing, the script must stay in `scripts/` next to `SKILL.md`. Copying
+`SKILL.md` on its own gives you a skill that refers to a tool that isn't there.
+When a handoff is headed to a terminal tool other than Claude Code, the skill copies
+the script next to the handoff file so it can travel with it, since that tool won't
+have the skill installed.
 
 ## Install
 
 **Installing in Claude Code or the CLI.** If you're flush with tokens, you can always 
-just ask Claude to install it for you (and if updating, unintstall the prior version first, otherwise, put the whole folder at `~/.claude/skills/handoff` for personal use, or at `.claude/skills/handoff` inside a project for that project only.  
+just ask Claude to install it for you (and if updating, uninstall the prior version first). Otherwise, put the whole folder at `~/.claude/skills/handoff` for personal use, or at `.claude/skills/handoff` inside a project for that project only.  
 Keep the structure intact:
 
 ```
@@ -216,22 +244,26 @@ under **Settings → Capabilities → Skills**. You have the option to toggle it
 /handoff
 ```
 
-If in Claude Code you may also see
+In the Claude CLI you may also see
 ```
 /anthropic-skills:handoff
 ```
-as a possible selection, **they are the same skill**, but the Anthropic desktop app copies that skill personal skill into an internal per-session cache and surfaces it under a generic anthropic-skills: plugin-style prefix. Just choose the /handoff option, but either will work.
+as a possible selection. **They are the same skill.** Just choose the /handoff option,
+but either will work.
 
-On its own, it asks you two things: what the next session is for, and where it's
-going. Answer both up front and it asks nothing:
+On its own, it always asks where the next session is going. It only asks what the
+next session is for if your chat covered more than one topic. Answer both up front
+and it skips those questions:
 
 ```
 /handoff finishing the grant draft in ChatGPT
-/handoff continuing this session later, same repo (or new in fresh chat)
+/handoff continuing this session later, same repo
 ```
 
 Those two facts are checked separately. Give it the topic but not the destination
-and it will still ask about the destination.
+and it will still ask about the destination. It may also check a few details along
+the way: whether the next tool can run a terminal, what to do if it finds a password
+or personal detail in your work, or how to handle a very large file.
 
 ## Not what it's for
 
@@ -248,18 +280,20 @@ MIT
 
 ## <a id="Attribution"></a>Attribution for upgrades: What changed, and who inspired it
 
-The changes were not a result of forking either of the two handoff repos that inspired 
-further changes. Each of their handoff Skill.mds were uploaded into Claude and compared one at a time against my previously existing handoff.skill. Another skill was also compared but offered no positive traits to incorporate. The positive traits were added to a prompt, and
+The changes were not a result of forking any of the handoff skills that inspired
+them. Each one's SKILL.md was uploaded into Claude and compared, one at a time,
+against my previously existing handoff.skill. The positive traits were added to a prompt, and
 then Claude made the changes to my handoff.skill package where possible.
 
 ## Credits (short version)
 
-This update borrowed ideas from two other handoff skills found online:
+This update borrowed ideas from three other handoff skills found online:
 - **Matt Pocock's** handoff skill https://github.com/mattpocock
 - **ToolMonsters'** handoff skill https://github.com/ToolMonsters
+- **Ruben Hassid's** handoff skill https://ruben.substack.com/
 
 Everything below is grouped by which one inspired it, plus what was already part
-of the skill before either was reviewed. Documentation compiled by Claude Code.
+of the skill before any were reviewed. Documentation compiled by Claude Code.
 
 ---
 
@@ -268,7 +302,7 @@ of the skill before either was reviewed. Documentation compiled by Claude Code.
 1. **Manual-only triggering.** The skill no longer offers itself unprompted or
    triggers from natural phrases like "hand this off" — it now only runs when you
    type `/handoff` directly.  
-   (Mainly true for Claude Code, though there's been no record of it firing without manual intiation in Claude.ai.) 
+   (Mainly true for Claude Code, though there's been no record of it firing without manual initiation in Claude.ai.) 
 2. **A focus argument.** You can now type something after the command, like
    `/handoff continue the login bug fix`, and the document will lean toward that
    topic.
@@ -280,7 +314,7 @@ of the skill before either was reviewed. Documentation compiled by Claude Code.
    up front instead of left implied.
 5. **Widening the existing redaction rule to cover personal information** (names,
    emails), not just passwords and API keys. The redaction itself already
-   existed — see "What was already part of your skill" below — Matt's example is
+   existed — see "What was already part of the handoff.skill before any review" below — Matt's example is
    what prompted broadening what it catches.
 
 ## Changes inspired by ToolMonsters' skill
@@ -290,7 +324,7 @@ of the skill before either was reviewed. Documentation compiled by Claude Code.
    session won't be able to open that file itself.
 2. **"Zero invention"** — reinforcing that if there isn't enough to go on, the
    document should say "unclear" rather than filling the gap with a guess. This
-   sits alongside your skill's existing [confirmed] / [double-checked] / [inferred]
+   sits alongside the skill's existing [observed] / [verified] / [inferred]
    labeling — it didn't replace it, just tightened the one edge case where there's
    nothing to reason from at all.
 3. **Cleaner output** — no "here's your document!" before it, no closing remarks
@@ -302,24 +336,50 @@ of the skill before either was reviewed. Documentation compiled by Claude Code.
    ChatGPT, Gemini, or any LLM, and that's what prompted adding real support for
    that case rather than assuming the next stop is always Claude.
 
-## Where the two ideas had to be reconciled (not from either skill directly)
+## Changes inspired by Ruben Hassid's skill
+
+Ruben's skill is a short, single-purpose summary tool (about 150 lines). Most of what it
+does was already covered here, so only two ideas were taken.
+
+1. **A suggested opening prompt.** A ready-to-paste first message for the new chat,
+   added as its own section at the end of the document. It only appears when the
+   handoff is going to claude.ai or another AI, since a Claude Code session opens the
+   file directly. It doesn't repeat the handoff; it points the new session at the first
+   action in "Start here."
+2. **A second pass before delivering.** After drafting, the skill re-reads the
+   conversation for three things that are easy to miss: a correction made once in a
+   throwaway line, a constraint stated once and never repeated, and a file reference
+   that points at an old version instead of the current one. Unresolved contradictions
+   get listed as open questions rather than quietly decided. The first two checks were
+   folded into the existing "what did the user ask for or rule out" step, and the
+   version check into the existing precision rules, so each rule lives in one place.
+   Only the second pass itself was added as a new step.
+
+Not taken: Ruben's option to write handoffs for a human colleague or your future self.
+This skill is written for a model that will act on the handoff, not a person catching
+up, so adding those would contradict its purpose.
+
+## Where the two ideas had to be reconciled (not from any of the source skills directly)
 
 Matt's "suggested skills" idea and ToolMonsters' "hand off to any AI" idea don't
 naturally fit together — a list of Claude skills is useless if the next stop is
 ChatGPT. So the skill now explicitly asks (or picks up from your typed focus, if
 you mentioned it) where the conversation is actually headed next, and reuses that
-one answer for two decisions at once:
-- whether to paste content in full vs. just reference the file, and
-- whether the "suggested skills" section gets included at all.
+one answer for several decisions at once:
+- whether to paste content in full vs. just reference the file,
+- whether the "suggested skills" section gets included at all,
+- whether the document ends with a suggested opening prompt, and
+- whether the file-fingerprint check is offered, and whether the script travels
+  with the handoff.
 
 This piece was original glue work needed to make the two borrowed ideas coexist
 without contradicting each other — worth a mention in credits, but it's not
-something to attribute to either source skill specifically.
+something to attribute to any source skill specifically.
 
-## What was already part of the handoff.skill, unchanged
+## What was already part of the handoff.skill before any review
 
-None of this came from Matt or ToolMonsters — it's what the skill already did,
-and none of it was touched by this update:
+None of this came from Matt, ToolMonsters, or Ruben — it's what the skill already did
+before any of them were reviewed. Some of it was later improved, as described above:
 - Digging into what actually happened (checking file changes, error messages,
   things that failed) instead of relying on memory of the conversation.
 - Separating "worth remembering forever" from "will be stale in a week," with an
