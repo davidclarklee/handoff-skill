@@ -101,14 +101,29 @@ section. A reader who turns out not to have those skills has read one extra para
 described capabilities, which costs almost nothing; a reader who does have them and never
 heard about them has lost something real.
 
-**Resolve this once, here, and reuse the answer.** Three later places depend on it:
+**Also settle whether the next session can run a terminal on these files.** The drift check
+(Section 0 of Step 3's template, and the bundled script) only works where the next reader has
+both a shell and these files on disk — it re-hashes the files and compares them against the
+inventory table. Destination (a) always qualifies. Destination (b) never does: a claude.ai
+chat has no filesystem, and got the work pasted in verbatim instead of by path. Destination
+(c) depends on the tool, not the vendor — an agentic terminal tool (Codex CLI, Cursor, aider,
+Gemini CLI) with the files checked out qualifies; a plain chat (ChatGPT or Gemini web) does
+not. If it's (c) and unclear which, ask one line. Call the result the **drift-check
+capability** and reuse it.
+
+**Resolve this once, here, and reuse the answer.** Five later places depend on it:
 
 - **The *Work in progress (verbatim)* section** of Step 3's template — pasted whole for
   (b) and (c), omitted entirely for (a)
 - **The *Suggested skills* section** of Step 3's template — skipped entirely for (c)
+- **The *Suggested opening prompt* section** of Step 3's template — included for (b) and
+  (c), omitted for (a)
 - **Step 6's "point, don't duplicate" rule** — whether it applies to the work in progress
+- **Section 0's drift-check offer and Step 7's companion script** — included only when the
+  drift-check capability is present; the script travels only when the destination isn't
+  Claude Code
 
-Don't re-ask, and don't let those three disagree with each other.
+Don't re-ask, and don't let those five disagree with each other.
 
 Also settle where the file goes: default to a Markdown file in the working directory named
 `handoff-<topic>-<YYYY-MM-DD>.md`. Markdown, not `.docx` or PDF — the next reader is a
@@ -175,6 +190,10 @@ that do are worth the whole exercise.
   same obvious idea from the same evidence and re-proposes it within minutes. Naming the
   rejected approach and why it failed is what prevents a repeat.
 - What did the user explicitly ask for or rule out? Their preferences aren't in the code.
+  Sweep specifically for the two kinds that hide: a correction made once in a throwaway line
+  ("shorter", "not that tone", "Friday not Monday"), and a constraint stated once early and
+  never repeated. Recency is not importance — a requirement from message 3 still governs, and
+  a preference paid for once must not be paid for again.
 
 **Known-broken**
 - What's broken right now, and is it yours or upstream?
@@ -218,6 +237,13 @@ conversation holds nothing that isn't here. State the date and the evidence-mark
    Current state in two or three lines, then the explicit first action. Name the
    surface the next session should run on — Claude Code, claude.ai, a particular
    machine. "How to verify a change" is unusable advice to a reader with no shell.
+   When the drift-check capability is present (Step 1), add a first-action instruction
+   addressed to the next session: before editing anything, OFFER the file-drift check —
+   ask the user whether to run the inventory script against the paths in Section 1 and
+   compare the fingerprints to the table there. Report any that differ (the file changed
+   after this handoff was written; reconcile before editing), and run nothing without a
+   yes. Give the exact command, including where the script lives (see Section 1). Omit
+   this line entirely when the capability is absent — a reader with no shell can't act on it.
 
 ## 1. Paths and inventory
    Where everything lives. File inventory with sizes and hashes for anything that
@@ -225,6 +251,11 @@ conversation holds nothing that isn't here. State the date and the evidence-mark
    List any companion files that must travel with this handoff — screenshots, data,
    a support ticket, sample output, the durable-facts file — one line each on why the
    next session needs it. See Step 7.
+   If the drift-check capability is present and the next session is NOT Claude Code, the
+   inventory script must travel too — it is bundled inside the installed skill, so copy it
+   to sit beside the handoff file, list it here, and write the drift-check command in
+   Section 0 to match wherever it lands. Claude Code already has it installed, so it need
+   not travel there.
 
 ## 2. Work in progress (verbatim)
    Destinations (b) and (c) only — omit entirely for (a).
@@ -300,6 +331,13 @@ conversation holds nothing that isn't here. State the date and the evidence-mark
    Skip this section entirely if EITHER no relevant skills are available in this
    session, OR Step 1 resolved the destination to (c), a non-Claude platform — a
    reference to the Skill tool means nothing there.
+
+## 12. Suggested opening prompt
+   Destinations (b) and (c) only — omit for (a), whose next session opens the file directly.
+   A paste-ready first message for the new chat: one or two lines that name the immediate
+   next action and point at this document, so the user starts the next session by pasting it
+   rather than composing a prompt from scratch. It restates nothing — *"Continue from this
+   handoff; start with <the first action in Section 0>"* — because the document carries the detail.
 ```
 
 **Output discipline: no preamble, no sign-off.** The document file starts at its `#`
@@ -360,6 +398,8 @@ straight about how much is actually known.
 as it appeared. Identifiers are the one thing paraphrase destroys silently: `~/proj/build`
 for `C:\2026\proj\build-out`, "last Tuesday" for `2026-08-11`, "the auth error" for
 `AUTH_TOKEN_EXPIRED (401)` — each substitution turns a copy-pasteable fact into a search.
+When an artifact went through several versions, point at the live one: a reference to a
+superseded draft is as wrong as a mistyped path, and fails just as silently.
 And write the whole document for a stranger: no internal shorthand, no "the script we
 fixed", no "as discussed above" — the next reader has no above. These reinforce the
 evidence markers rather than replacing them; a precisely quoted string still needs its
@@ -388,9 +428,9 @@ and if it passes, actually draft the file and offer it by name.
 **If the gate passes**, draft a second, short file — `project-notes-<topic>.md` — containing
 only the durable material: invariants, environment notes, recurring decision rationale, and
 working preferences. Nothing dated, nothing perishable, and nothing drawn from *Start here*,
-*Paths and inventory*, *Work in progress*, *Known-broken*, *Open items*, *Open questions*, or
-*Suggested skills* — those are all about this moment, not about the project. Tell the user
-what surface it's for:
+*Paths and inventory*, *Work in progress*, *Known-broken*, *Open items*, *Open questions*,
+*Suggested skills*, or *Suggested opening prompt* — those are all about this moment, not
+about the project. Tell the user what surface it's for:
 - **Claude Code / a repo**: suggest naming it `CLAUDE.md` at the repo root — it's read
   automatically at the start of every future session there. If a `CLAUDE.md` already exists,
   never overwrite it — most projects keep real instructions in that file. Show the user the
@@ -450,6 +490,11 @@ moving to a new chat, especially on claude.ai or another platform where there is
 filesystem, a handoff that references `screenshot-3.png` is useless unless that file comes
 along too.
 
+When the drift-check capability applies and the destination is not Claude Code, the bundled
+inventory script is one of these companions: copy it next to the handoff so the next session
+can actually run the check, since that tool won't have the skill installed. The user then
+drags the whole set across at once rather than fishing the script out of the packaged skill.
+
 Put the list in two places, because the user should not have to open the document to find out
 what to carry:
 
@@ -467,12 +512,27 @@ Example closing blurb:
 > - `project-notes-auth.md` — durable facts; or paste into Project knowledge
 > - `login-error.png` — the screenshot the "known-broken" section refers to
 > - `sample-payload.json` — the request body that reproduces the bug
+> - `inventory.py` — the drift-check script (only when moving off Claude Code; that tool won't have the skill)
 
 Only list files the next session actually needs. A handoff for a self-contained project in a
 repo the next session already has may have no companions at all — say "nothing else to move,
 the handoff is self-contained" rather than padding the list.
 
-## Step 8 — Offer to validate
+## Step 8 — Re-scan before delivering
+
+Once the document is drafted and cut, read the *thread* against the *document* one last time —
+re-reading the draft alone shows what you meant to write; the leaks show only against the
+source. Three known ones, each pointing back to where its rule already lives:
+
+- A user correction or preference that never reached *Working preferences* (Step 2)?
+- A constraint stated once, early, and dropped as the session moved on (Step 2)?
+- An artifact reference pointing at a superseded version instead of the live one (Step 4)?
+
+If the thread holds a contradiction it never resolved, don't pick a winner silently — log it
+under *Open questions* as unresolved. It's a cheap pass, and it catches what recall can't:
+skipping it is how a paid-for correction gets paid for a second time.
+
+## Step 9 — Offer to validate
 
 The only real test of a handoff is whether a cold session behaves correctly given it.
 Suggest the user start a fresh chat with nothing but the document and see whether it asks
@@ -498,3 +558,7 @@ python scripts/inventory.py <path> [<path> ...]
 Include hashes whenever the next session might need to detect drift, along with a line
 saying what to do if they don't match — usually "someone changed this after the handoff
 was written; reconcile before editing."
+
+When the drift-check capability is present (Step 1), Section 0 turns this into an explicit
+first-action offer for the next session, and for any destination other than Claude Code the
+script travels as a companion file (Step 7) so it can actually be run.
